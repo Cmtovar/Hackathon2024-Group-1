@@ -9,10 +9,10 @@ class Station:
         self.departure_times = []
 
     def add_departure_time(self, time):
-        pass
+        self.departure_times.append(time)
 
     def add_arrival_time(self, time):
-        pass
+        self.arrival_times.append(time)
 
 
 def load_data(csv_file):
