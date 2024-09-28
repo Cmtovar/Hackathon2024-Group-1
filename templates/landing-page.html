@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to CTA Accessibility App{% endblock %}
+
+{% block content %}
+<h1>Welcome to CTA Accessibility App</h1>
+<p>Please select your current station to request assistance:</p>
+<form hx-get="{{ url_for(user_view) }}">
+    <label for="station">Select your station:</label>
+    <select name="station" id="station" required>
+        <option value="">Select a station</option>
+        <option value="Clark/Lake">Clark/Lake</option>
+        <option value="Washington/Wells">Washington/Wells</option>
+        <!-- Add more stations as needed -->
+    </select>
+    <button type="submit">Go to User View</button>
+</form>
+{% endblock %}

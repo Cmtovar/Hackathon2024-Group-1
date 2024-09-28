@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Worker View - {{ station_name }}{% endblock %}
+
+{% block content %}
+<h2>Worker View - {{ line_name }} Line, {{ station_name }} Station</h2>
+
+<div id="status-container" hx-get="{{ url_for('work_view', line_name=line_name, station_name=station_name) }}" hx-trigger="every 10s">
+    {% if needs_ramp %}
+        <div class="alert alert-info">
+            <strong>Action Required:</strong> Please place the ramp for a passenger requiring assistance.
+        </div>
+    {% else %}
+        <div class="alert alert-success">
+            <strong>Status:</strong> No assistance currently required at this station.
+        </div>
+    {% endif %}
+</div>
+
+<a href="{{ url_for('index') }}">Return to Home</a>
+{% endblock %}
