@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Worker View - CTA Accessibility App{% endblock %}
+
+{% block content %}
+<h2>Active Assistance Requests</h2>
+<div id="requests-container" hx-get="{{ url_for('get_active_requests') }}" hx-trigger="every 10s">
+    {% for request in requests %}
+        <div class="request-card">
+            <h3>Request #{{ request.id }}</h3>
+            <p><strong>Start Station:</strong> {{ request.start_station }}</p>
+            <p><strong>End Station:</strong> {{ request.end_station }}</p>
+            <p><strong>Timestamp:</strong> {{ request.timestamp }}</p>
+            <p><strong>Status:</strong> {{ request.status }}</p>
+            {% if request.status == 'active' %}
+                <button hx-post="{{ url_for('update_request_status', request_id=request.id) }}" 
+                        hx-swap="outerHTML"
+                        hx-target="closest .request-card">
+                    Mark as Completed
+                </button>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No active requests at the moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}
