@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Welcome to CTA Accessibility App</h1>
 <p>Please select your current station to request assistance:</p>
-<form action="{{ url_for('user_view', station='') }}" method="get">
+<form hx-get="{{ url_for(user_view) }}">
     <label for="station">Select your station:</label>
     <select name="station" id="station" required>
         <option value="">Select a station</option>

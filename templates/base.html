@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CTA Accessibility App{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
@@ -13,7 +12,6 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('worker_view') }}">Worker View</a></li>
             </ul>
         </nav>
     </header>
@@ -26,6 +24,5 @@
         <p>&copy; 2024 CTA Accessibility App</p>
     </footer>
     
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
