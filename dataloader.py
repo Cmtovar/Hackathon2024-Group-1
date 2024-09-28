@@ -7,7 +7,7 @@ class Station:
         self.name = name
         self.arrival_times = []
         self.departure_times = []
-        needs_ramp: bool = False
+        needs_ramp: tuple[bool, dt] = (False, None)
 
     def add_departure_time(self, time):
         self.departure_times.append(time)
@@ -35,7 +35,7 @@ def load_data(csv_file) -> list[Station]:
                 stations[station_name].add_arrival_time(time_parsed)
             else:
                 stations[station_name].add_departure_time(time_parsed)
-    return list(stations.values())
+    return stations.values()
 
 
 if __name__ == "__main__":
