@@ -7,6 +7,7 @@ class Station:
         self.name = name
         self.arrival_times = []
         self.departure_times = []
+        needs_ramp: bool = False
 
     def add_departure_time(self, time):
         self.departure_times.append(time)
