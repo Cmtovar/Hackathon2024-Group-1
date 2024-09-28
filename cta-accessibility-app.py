@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, jsonify, url_for, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import sqlite3
-import os
 
 app = Flask(__name__)
 
@@ -17,8 +16,10 @@ def init_db():
     conn = get_db_connection()
     conn.execute('''CREATE TABLE IF NOT EXISTS requests
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     line_name TEXT NOT NULL,
                      start_station TEXT NOT NULL,
-                     end_station TEXT NOT NULL,
+                     final_station TEXT NOT NULL,
+                     current_station TEXT NOT NULL,
                      timestamp TEXT NOT NULL,
                      status TEXT NOT NULL)''')
     conn.close()
@@ -27,44 +28,40 @@ init_db()
 
 @app.route('/')
 def index():
-    return render_template('user_form.html')
+    return render_template('landing.html')
 
-@app.route('/submit_request', methods=['POST'])
-def submit_request():
-    start_station = request.form['start_station']
-    end_station = request.form['end_station']
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+@app.route('/userview/<station>', methods=['GET', 'POST'])
+def user_view(station):
+    if request.method == 'POST':
+        line_name = request.form['line_name']
+        start_station = request.form['start_station']
+        final_station = request.form['final_station']
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        conn = get_db_connection()
+        conn.execute('INSERT INTO requests (line_name, start_station, final_station, current_station, timestamp, status) VALUES (?, ?, ?, ?, ?, ?)',
+                     (line_name, start_station, final_station, station, timestamp, 'active'))
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('success'))
     
+    return render_template('user_form.html', station=station)
+
+@app.route('/success')
+def success():
+    return render_template('success.html')
+
+@app.route('/workview/<line_name>/<station_name>')
+def work_view(line_name, station_name):
     conn = get_db_connection()
-    conn.execute('INSERT INTO requests (start_station, end_station, timestamp, status) VALUES (?, ?, ?, ?)',
-                 (start_station, end_station, timestamp, 'active'))
-    conn.commit()
+    request = conn.execute('SELECT * FROM requests WHERE line_name = ? AND current_station = ? AND status = "active" ORDER BY timestamp DESC LIMIT 1',
+                           (line_name, station_name)).fetchone()
     conn.close()
     
-    return "Request submitted successfully"
-
-@app.route('/worker')
-def worker_view():
-    conn = get_db_connection()
-    requests = conn.execute('SELECT * FROM requests WHERE status = "active" ORDER BY timestamp DESC').fetchall()
-    conn.close()
-    return render_template('worker_view.html', requests=requests)
-
-@app.route('/get_active_requests')
-def get_active_requests():
-    conn = get_db_connection()
-    requests = conn.execute('SELECT * FROM requests WHERE status = "active" ORDER BY timestamp DESC').fetchall()
-    conn.close()
-    return render_template('worker_view.html', requests=requests)
-
-@app.route('/update_request_status/<int:request_id>', methods=['POST'])
-def update_request_status(request_id):
-    conn = get_db_connection()
-    conn.execute('UPDATE requests SET status = "completed" WHERE id = ?', (request_id,))
-    conn.commit()
-    request = conn.execute('SELECT * FROM requests WHERE id = ?', (request_id,)).fetchone()
-    conn.close()
-    return render_template('request_card.html', request=request)
+    needs_ramp = bool(request)
+    
+    return render_template('work_view.html', line_name=line_name, station_name=station_name, needs_ramp=needs_ramp)
 
 @app.template_filter('format_datetime')
 def format_datetime(value, format='%Y-%m-%d %H:%M:%S'):

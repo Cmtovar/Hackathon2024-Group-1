@@ -1,27 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Worker View - CTA Accessibility App{% endblock %}
+{% block title %}Worker View - {{ station_name }}{% endblock %}
 
 {% block content %}
-<h2>Active Assistance Requests</h2>
-<div id="requests-container" hx-get="{{ url_for('get_active_requests') }}" hx-trigger="every 10s">
-    {% for request in requests %}
-        <div class="request-card">
-            <h3>Request #{{ request.id }}</h3>
-            <p><strong>Start Station:</strong> {{ request.start_station }}</p>
-            <p><strong>End Station:</strong> {{ request.end_station }}</p>
-            <p><strong>Timestamp:</strong> {{ request.timestamp }}</p>
-            <p><strong>Status:</strong> {{ request.status }}</p>
-            {% if request.status == 'active' %}
-                <button hx-post="{{ url_for('update_request_status', request_id=request.id) }}" 
-                        hx-swap="outerHTML"
-                        hx-target="closest .request-card">
-                    Mark as Completed
-                </button>
-            {% endif %}
+<h2>Worker View - {{ line_name }} Line, {{ station_name }} Station</h2>
+
+<div id="status-container" hx-get="{{ url_for('work_view', line_name=line_name, station_name=station_name) }}" hx-trigger="every 10s">
+    {% if needs_ramp %}
+        <div class="alert alert-info">
+            <strong>Action Required:</strong> Please place the ramp for a passenger requiring assistance.
         </div>
     {% else %}
-        <p>No active requests at the moment.</p>
-    {% endfor %}
+        <div class="alert alert-success">
+            <strong>Status:</strong> No assistance currently required at this station.
+        </div>
+    {% endif %}
 </div>
+
+<a href="{{ url_for('index') }}">Return to Home</a>
 {% endblock %}
