@@ -1,5 +1,5 @@
 from flask import Flask, request, redirect, url_for
-from datetime import datetime
+from datetime import datetime as dt
 
 from .dataloader import load_data
 
@@ -19,12 +19,16 @@ def user_view():
     start_station = data.get("start")
     final_station = data.get("final")
     stations[start_station].needs_ramp = True
+    stations[final_station].needs_ramp = True
 
 
 @app.route("/workerview/<line>/<station>")
 def worker_view(line, station):
-    # TODO return a boolean to indicate whether the worker should place the ramp
-    pass
+    is_ramp_needed, time = stations[station].needs_ramp
+    if time < dt.now():
+        stations[station].needs_ramp = (False, None)
+        return False
+    return is_ramp_needed
 
 
 if __name__ == "__main__":
